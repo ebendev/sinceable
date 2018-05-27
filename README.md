@@ -1,8 +1,6 @@
 # Sinceable
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/sinceable`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+A tiny gem that adds two simple scopes (`since` and `until`) to all of your ActiveRecord models for finding records by timestamp.
 
 ## Installation
 
@@ -22,7 +20,21 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+The tiny `sinceable` gem adds the following two scopes to `ActiveRecord::Base`, making them available in all your models. (That's all it does!)
+
+```ruby
+scope :since, ->(time, column = :created_at) { where(arel_table[column].gteq(time)) }
+scope :until, ->(time, column = :created_at) { where(arel_table[column].lt(time)) }
+```
+
+This allows you to perform queries such as these:
+
+```ruby
+Order.since(3.days.ago) # orders with `created_at` within the last 3 days
+User.until(Date.today, :confirmed_at) # users where `confirmed_at` is before today
+```
+
+**Note:** The `since` scope is inclusive of the timestamp (`>=`) queried, whereas the `until` scope is exclusive of the timestamp (`<`) queried. This most likely follows intent, as if you want records "since" 3:00 pm, you likely mean to include those created at exactly 3:00 pm, whereas if you want the records "until" 3 pm, you likely mean to exclude any records created "since" 3:00 pm, for example.
 
 ## Development
 
